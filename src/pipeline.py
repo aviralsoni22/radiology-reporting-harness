@@ -40,7 +40,7 @@ class OpenRouterClient(LLMClient):
     Model IDs use provider/model form (e.g. 'anthropic/claude-opus-4.8').
     Check https://openrouter.ai/models for current IDs and live pricing.
     """
-    def __init__(self, model="anthropic/claude-opus-4.8",
+    def __init__(self, model="moonshot/kimi-k2.6",
                  max_tokens=1024, temperature=0.0, timeout=60):
         key = os.environ.get("OPENROUTER_API_KEY")
         if not key:
@@ -84,11 +84,13 @@ MODELS = {
     "gpt":      "openai/gpt-4o",
     "gpt-mini": "openai/gpt-4o-mini",
     "gemini":   "google/gemini-2.0-flash-001",
-    "deepseek": "deepseek/deepseek-chat",
     "llama":    "meta-llama/llama-3.1-70b-instruct",
+    "kimi":     "moonshot/kimi-k2.6",
+    "deepseek": "deepseek/deepseek-v4-flash-0731",
+    "GLM":      "z-ai/glm-5.3-flash"
 }
 
-DEFAULT_MODEL = "opus"   # <- change this to switch the pipeline's default
+DEFAULT_MODEL = "GLM"   # <- change this to switch the pipeline's default
 
 
 def make_client(model=None, **kw):
@@ -131,18 +133,22 @@ _STOP = set(normalize("no not of or the and with within normal identified "
 # Prompts (tune these against local RES in Phase 3)
 # --------------------------------------------------------------------------
 FIELD_SYSTEM = (
-    "You edit one field of a radiology report. Rewrite the NORMAL field so it "
-    "reflects the dictated finding for THIS field only. Rules: change only what "
-    "the finding requires; keep every other word of the normal field verbatim; "
-    "reuse the field's existing vocabulary; keep negations for anything not "
-    "mentioned; match the phrasing style of the EXAMPLES. Output the field text "
-    "only, no label, no commentary.")
+    "You are a strict radiology editor. Edit the NORMAL field to reflect the dictated finding. "
+    "CRITICAL RULES:\n"
+    "1. Do not rewrite the sentence structure unless absolutely necessary.\n"
+    "2. If the dictated finding does not apply to this field, return the CURRENT NORMAL FIELD exactly word-for-word.\n"
+    "3. Keep every other word of the normal field verbatim.\n"
+    "4. Do not remove any negations (e.g., 'no', 'without') unless the finding contradicts them.\n"
+    "5. Output the final field text ONLY. Do not include labels, explanations, or quotes.")
 
 IMPRESSION_SYSTEM = (
-    "You write the IMPRESSION section of a radiology report: a concise summary of "
-    "the abnormal findings only, in the style of the EXAMPLES. Do not restate "
-    "normal fields. Do not add anything not supported by the findings. Output the "
-    "impression text only.")
+    "You write the IMPRESSION section of a radiology report. "
+    "CRITICAL RULES:\n"
+    "1. Provide a concise summary of the abnormal findings only.\n"
+    "2. Do not restate normal fields or normal measurements.\n"
+    "3. Do not introduce any findings or diagnoses not explicitly supported by the dictation.\n"
+    "4. Match the short, telegraphic phrasing style of the EXAMPLES.\n"
+    "5. Output the impression text ONLY. Do not include labels, explanations, or quotes.")
 
 
 def _exemplar_block(exemplars):

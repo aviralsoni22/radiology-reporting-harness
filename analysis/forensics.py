@@ -18,8 +18,8 @@ import sys
 from collections import Counter, defaultdict
 
 sys.path.insert(0, "src")
-from src.parse import parse_report, normalize_eq          # noqa: E402
-from src.scorer import normalize                          # noqa: E402
+from parse import parse_report, normalize_eq          # noqa: E402
+from scorer import normalize                          # noqa: E402
 
 
 def load(path):

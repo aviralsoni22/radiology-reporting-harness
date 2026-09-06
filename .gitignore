@@ -220,3 +220,6 @@ __marimo__/
 # Local-only notes (repo root)
 /CLAUDE_CODE_GUIDE.md
 /CONTEXT.md
+/analysis/*.csv
+/analysis/*.tsv
+/submission.csv
