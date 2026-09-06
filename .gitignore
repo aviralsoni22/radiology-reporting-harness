@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local-only notes (repo root)
+/CLAUDE_CODE_GUIDE.md
+/CONTEXT.md
